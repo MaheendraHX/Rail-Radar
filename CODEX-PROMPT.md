@@ -1,6 +1,48 @@
 # 🔧 PASTE THIS INTO CODEX (OR ANY OTHER AI ASSISTANT)
 
-> **Start by telling your AI:** "Read the project guide below. I am [YOUR ROLE] on the RailRadar project. Help me implement my part. The other team members are working on their parts simultaneously."
+> **Tell your AI:** "I am **[YOUR ROLE]** on RailRadar. I need to work on the **[BRANCH NAME]** branch. Help me implement my part."
+
+**Example prompt:**
+> "I am FRONTEND-1 on RailRadar. Clone the repo, switch to the `frontend-1` branch, and help me build the map core. Read the guide below."
+
+---
+
+## 🌿 BRANCH WORKFLOW — START HERE
+
+Each person works on their **own branch**. Never push directly to `main`.
+
+### Step 1: Clone & Switch to Your Branch
+
+```bash
+git clone https://github.com/MaheendraHX/Rail-Radar.git railradar
+cd railradar
+git checkout [YOUR-BRANCH]    # see table below
+```
+
+### Your Branch & Files (ONLY edit these)
+
+| Role | Branch | Files You Own |
+|------|--------|---------------|
+| **DATA-1** | `data-1` | `data/raw/` (download files here) |
+| **DATA-2** | `data-2` | `data/preprocess_stations.py`, `data/filter_geojson.py`, `data/build_station_track_index.py` |
+| **BACKEND-1** | `backend-1` | `backend/app.py`, `backend/data_loader.py`, `backend/requirements.txt`, `backend/__init__.py` |
+| **BACKEND-2** | `backend-2` | `backend/interpolation.py`, `backend/predictor.py`, `backend/test_interpolation.py` |
+| **FRONTEND-1** | `frontend-1` | `frontend/js/map.js` |
+| **FRONTEND-2** | `frontend-2` | `frontend/index.html`, `frontend/css/style.css`, `frontend/js/ui.js` |
+| **FRONTEND-3** | `frontend-3` | `frontend/js/controls.js`, `frontend/js/train-icon.js`, `frontend/js/stations.js` |
+
+### Step 2: Work, Commit, Push
+
+```bash
+# Make your changes, then:
+git add [YOUR FILES]
+git commit -m "what you built"
+git push origin [YOUR-BRANCH]
+```
+
+### Step 3: When Done
+
+Tell Maheendra your branch is ready. They merge it into `main`.
 
 ---
 
@@ -9,6 +51,7 @@
 We are building a web app that shows train icons moving along actual railway tracks on an interactive map of **South India** (Kerala, Tamil Nadu, Karnataka). Think Flightradar24, but for trains.
 
 **Repository:** https://github.com/MaheendraHX/Rail-Radar
+**Branches:** `main`, `data-1`, `data-2`, `backend-1`, `backend-2`, `frontend-1`, `frontend-2`, `frontend-3`
 **Stack:** Python Flask (backend) + Vanilla JS + Leaflet.js (frontend)
 **Map Tiles:** CartoDB.DarkMatter (free, no key needed)
 **No API keys required for anything.**
@@ -67,6 +110,7 @@ railradar/
 ## 🔧 THE 7 ROLES
 
 ### DATA-1: Data Acquisition & Cleaning
+**🌿 Branch:** `data-1`  |  **Run:** `git checkout data-1`
 **Files to create/modify:** Nothing code-wise. Just download datasets.
 **Deliverables:**
 - `data/raw/EXP-TRAINS.json` from Kaggle ("Indian Trains Schedule & Routes" by Rohan Patel)
@@ -92,6 +136,7 @@ Go to https://overpass-turbo.eu, paste this, click Run, then Export → download
 ---
 
 ### DATA-2: Preprocessing Scripts & Validation
+**🌿 Branch:** `data-2`  |  **Run:** `git checkout data-2`
 **Files to create:** `data/preprocess_stations.py`, `data/filter_geojson.py`, `data/build_station_track_index.py`
 **Dependencies:** Needs DATA-1's raw files first.
 
@@ -117,6 +162,7 @@ Go to https://overpass-turbo.eu, paste this, click Run, then Export → download
 ---
 
 ### BACKEND-1: Flask Server & API
+**🌿 Branch:** `backend-1`  |  **Run:** `git checkout backend-1`
 **Files to create:** `backend/app.py`, `backend/data_loader.py`, `backend/requirements.txt`, `backend/__init__.py`
 **Dependencies:** Needs processed data from DATA-2 + interpolation engine from BACKEND-2 (or use mock data initially).
 
@@ -188,6 +234,7 @@ shapely==2.0.2
 ---
 
 ### BACKEND-2: Interpolation Engine + Delay Simulation + AI Predictor
+**🌿 Branch:** `backend-2`  |  **Run:** `git checkout backend-2`
 **Files to create:** `backend/interpolation.py`, `backend/predictor.py`, `backend/test_interpolation.py`
 **Dependencies:** Needs processed data files from DATA-2.
 
@@ -239,7 +286,8 @@ Function `predict_delay_risk(schedule, simulated_time, distance_traveled)`:
 ---
 
 ### FRONTEND-1: Map Core Developer
-**Files to create:** `frontend/js/map.js`
+**🌿 Branch:** `frontend-1`  |  **Run:** `git checkout frontend-1`
+**Files to create/modify:** `frontend/js/map.js`
 **Dependencies:** Can start immediately (works with backend mock data).
 
 **What to build:**
@@ -281,7 +329,8 @@ Function `predict_delay_risk(schedule, simulated_time, distance_traveled)`:
 ---
 
 ### FRONTEND-2: Info Panel + Admin Delay Control + Search
-**Files to create:** `frontend/index.html`, `frontend/css/style.css`, `frontend/js/ui.js`
+**🌿 Branch:** `frontend-2`  |  **Run:** `git checkout frontend-2`
+**Files to create/modify:** `frontend/index.html`, `frontend/css/style.css`, `frontend/js/ui.js`
 **Dependencies:** Can start immediately.
 
 **index.html structure:**
@@ -331,7 +380,8 @@ Function `predict_delay_risk(schedule, simulated_time, distance_traveled)`:
 ---
 
 ### FRONTEND-3: Controls, Animation & Station Labels
-**Files to create:** `frontend/js/controls.js`, `frontend/js/train-icon.js`, `frontend/js/stations.js`
+**🌿 Branch:** `frontend-3`  |  **Run:** `git checkout frontend-3`
+**Files to create/modify:** `frontend/js/controls.js`, `frontend/js/train-icon.js`, `frontend/js/stations.js`
 **Dependencies:** Can start immediately.
 
 **controls.js:**
