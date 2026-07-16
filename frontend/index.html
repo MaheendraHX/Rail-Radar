@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailRadar — Real-Time Indian Train Tracker</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- App CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  TOP BAR                                     -->
+    <!-- ════════════════════════════════════════════ -->
+    <header id="top-bar">
+        <div class="top-bar-left">
+            <h1 class="app-title">🚂 RailRadar</h1>
+            <span class="app-subtitle">South India Live Tracker</span>
+        </div>
+        <div class="top-bar-center">
+            <div class="status-pill" id="status-pill">
+                <span class="status-dot"></span>
+                <span id="active-count">0 trains active</span>
+                <span class="status-sep">|</span>
+                <span id="server-time">--:--:--</span>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <div id="speed-controls" class="speed-controls">
+                <span class="speed-label">Speed:</span>
+                <button class="speed-btn active" data-speed="1">1×</button>
+                <button class="speed-btn" data-speed="10">10×</button>
+                <button class="speed-btn" data-speed="60">60×</button>
+                <button class="speed-btn" data-speed="100">100×</button>
+                <span class="speed-status" id="speed-status">Real-time</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  SEARCH BAR                                  -->
+    <!-- ════════════════════════════════════════════ -->
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search train (number or name)..." autocomplete="off">
+        <div id="search-results" class="search-results hidden"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  MAP                                         -->
+    <!-- ════════════════════════════════════════════ -->
+    <div id="map"></div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  INFO PANEL (slides in from right)           -->
+    <!-- ════════════════════════════════════════════ -->
+    <div id="info-panel" class="info-panel hidden">
+        <button class="panel-close" id="info-panel-close">✕</button>
+        <div class="panel-content">
+            <h2 id="info-train-name" class="info-train-name">Train Name</h2>
+            <p id="info-train-number" class="info-train-number">#00000</p>
+
+            <div class="info-divider"></div>
+
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value" id="info-status">
+                    <span class="status-indicator" id="info-status-dot"></span>
+                    <span id="info-status-text">—</span>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Speed</span>
+                <span class="info-value" id="info-speed">— km/h</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Current Station</span>
+                <span class="info-value" id="info-current-station">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Next Station</span>
+                <span class="info-value" id="info-next-station">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ETA</span>
+                <span class="info-value" id="info-eta">—</span>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-row">
+                <span class="info-label">Departure</span>
+                <span class="info-value" id="info-departure">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Arrival</span>
+                <span class="info-value" id="info-arrival">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Stops</span>
+                <span class="info-value" id="info-stops">—</span>
+            </div>
+
+            <div id="info-delay-row" class="info-row info-delay hidden">
+                <span class="info-label">⚠ Delay</span>
+                <span class="info-value info-delay-value" id="info-delay-value">0 min</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  ADMIN DELAY CONTROL PANEL                   -->
+    <!-- ════════════════════════════════════════════ -->
+    <div id="admin-panel" class="admin-panel">
+        <h3 class="admin-title">⚙ Delay Control</h3>
+
+        <label class="admin-label" for="admin-train-select">Train:</label>
+        <select id="admin-train-select" class="admin-select">
+            <option value="">— Select train —</option>
+        </select>
+
+        <label class="admin-label" for="admin-delay-slider">
+            Delay: <span id="admin-delay-value">0</span> min
+        </label>
+        <input type="range" id="admin-delay-slider" class="admin-slider" min="0" max="120" step="5" value="0">
+
+        <div class="admin-buttons">
+            <button id="admin-apply-btn" class="btn btn-primary">Apply Delay</button>
+            <button id="admin-reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+
+        <div class="admin-divider"></div>
+
+        <button id="admin-ai-btn" class="btn btn-ai">🧠 AI Predict Delay</button>
+
+        <div id="admin-status" class="admin-status"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  LEGEND PANEL                                -->
+    <!-- ════════════════════════════════════════════ -->
+    <div id="legend-panel" class="legend-panel">
+        <h4 class="legend-title">Legend</h4>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: var(--accent-green);"></span>
+            <span>Moving</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: var(--accent-red);"></span>
+            <span>Dwelling</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: var(--accent-blue);"></span>
+            <span>Delayed</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: var(--accent-purple);"></span>
+            <span>AI Delayed</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-line"></span>
+            <span>Rail Track</span>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  CONNECTING OVERLAY                         -->
+    <!-- ════════════════════════════════════════════ -->
+    <div id="connecting-overlay" class="connecting-overlay">
+        <div class="connecting-spinner"></div>
+        <p>Connecting to RailRadar backend...</p>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!--  SCRIPTS                                     -->
+    <!--  Load order matters: Leaflet → shared icons → controls → stations → map → ui  -->
+    <!-- ════════════════════════════════════════════ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/train-icon.js"></script>
+    <script src="js/controls.js"></script>
+    <script src="js/stations.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/ui.js"></script>
+
+</body>
+</html>

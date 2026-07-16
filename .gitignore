@@ -1,0 +1,18 @@
+# Raw data files (too large for git)
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
