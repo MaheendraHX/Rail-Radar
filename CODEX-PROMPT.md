@@ -37,12 +37,27 @@ git checkout [YOUR-BRANCH]    # see table below
 # Make your changes, then:
 git add [YOUR FILES]
 git commit -m "what you built"
+<<<<<<< HEAD
 git push origin [YOUR-BRANCH]
 ```
 
 ### Step 3: When Done
 
 Tell Maheendra your branch is ready. They merge it into `main`.
+=======
+git push origin [YOUR-BRANCH]  # ⚠️ NEVER push to main!
+```
+
+**⚠️ CRITICAL WARNING:**
+- **NEVER** run `git push origin main` or `git push origin master`
+- **NEVER** run `git checkout main` and push
+- **ALWAYS** push to your specific branch: `git push origin frontend-1` (or your branch)
+- If you push to `main`, you'll break the project for everyone
+
+### Step 3: When Done
+
+Tell Maheendra your branch is ready. **They merge it into `main`.** You do NOT merge.
+>>>>>>> backend-2
 
 ---
 
