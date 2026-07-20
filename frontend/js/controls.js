@@ -1,38 +1,54 @@
-/* ══════════════════════════════════════════════════
-   RailRadar — Controls
-   FRONTEND-3's deliverable.
-   
-   Speed controls (1x, 10x, 60x, 100x)
-   ══════════════════════════════════════════════════ */
+/* RailRadar speed controls. FRONTEND-1 reads window.currentSpeed per poll. */
+(function () {
+    'use strict';
 
-// ─── Global speed variable ───
-// FRONTEND-1's polling loop reads this and passes it as ?speed=N
-window.currentSpeed = 1;
+    var SPEED_DESCRIPTIONS = {
+        1: 'Real-time',
+        10: '10× speed',
+        60: '1 min/sec',
+        100: '~2 min journey'
+    };
 
-const SPEED_DESCRIPTIONS = {
-    1:   'Real-time',
-    10:  '10× speed',
-    60:  '1 min/sec',
-    100: '~2 min journey'
-};
+    // Do not overwrite a speed selected before this script is re-initialized.
+    window.currentSpeed = Number(window.currentSpeed) || 1;
 
-document.addEventListener('DOMContentLoaded', function () {
-    const buttons = document.querySelectorAll('.speed-btn');
-    const statusLabel = document.getElementById('speed-status');
+    function setSpeed(speed, buttons, statusLabel) {
+        if (!Object.prototype.hasOwnProperty.call(SPEED_DESCRIPTIONS, speed)) return;
 
-    buttons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            // Remove active from all
-            buttons.forEach(function (b) { b.classList.remove('active'); });
-            // Activate clicked
-            btn.classList.add('active');
-
-            const speed = parseInt(btn.getAttribute('data-speed'), 10);
-            window.currentSpeed = speed;
-
-            if (statusLabel) {
-                statusLabel.textContent = SPEED_DESCRIPTIONS[speed] || '';
-            }
+        window.currentSpeed = speed;
+        buttons.forEach(function (button) {
+            var isActive = Number(button.dataset.speed) === speed;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', String(isActive));
         });
-    });
-});
+
+        if (statusLabel) statusLabel.textContent = SPEED_DESCRIPTIONS[speed];
+
+        // Lets consumers refresh immediately without coupling this file to map.js.
+        window.dispatchEvent(new CustomEvent('railradar:speedchange', {
+            detail: { speed: speed }
+        }));
+    }
+
+    function initSpeedControls() {
+        var buttons = Array.prototype.slice.call(document.querySelectorAll('.speed-btn'));
+        var statusLabel = document.getElementById('speed-status');
+        if (!buttons.length) return;
+
+        buttons.forEach(function (button) {
+            button.type = 'button';
+            button.setAttribute('aria-pressed', 'false');
+            if (button.dataset.railradarBound === 'true') return;
+
+            button.dataset.railradarBound = 'true';
+            button.addEventListener('click', function () {
+                setSpeed(Number(button.dataset.speed), buttons, statusLabel);
+            });
+        });
+
+        setSpeed(window.currentSpeed, buttons, statusLabel);
+    }
+
+    window.initSpeedControls = initSpeedControls;
+    document.addEventListener('DOMContentLoaded', initSpeedControls);
+}());
